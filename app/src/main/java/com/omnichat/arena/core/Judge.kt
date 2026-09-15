@@ -41,6 +41,13 @@ data class JudgeVerdict(
 class JudgeEngine @Inject constructor() {
 
     fun fastJudge(prompt: String, answers: List<ArenaAnswer>): JudgeVerdict {
+        if (answers.isEmpty()) {
+            return JudgeVerdict(
+                winner = ProviderId.FAKE,
+                scores = emptyList(),
+                rationale = "No answers to evaluate.",
+            )
+        }
         val scored = answers.map { a ->
             if (a.error != null || a.text.isBlank()) {
                 return@map JudgeScore(a.providerId, 0f, mapOf("error" to 0f))
@@ -78,7 +85,7 @@ class JudgeEngine @Inject constructor() {
                 signals["speed"]!! * 0.10f)
             JudgeScore(a.providerId, (blended * 10).roundToInt() / 10f, signals)
         }
-        val winner = scored.maxByOrNull { it.score }?.providerId ?: answers.first().providerId
+        val winner = scored.maxByOrNull { it.score }?.providerId ?: answers.firstOrNull()?.providerId ?: ProviderId.FAKE
         return JudgeVerdict(
             winner = winner,
             scores = scored.sortedByDescending { it.score },
@@ -115,57 +122,66 @@ class JudgeEngine @Inject constructor() {
             return fastVerdict.copy(rationale = "${fastVerdict.rationale} (LLM judge output was not JSON)")
         }
         val jsonStr = rawResponse.substring(start, end + 1)
-        val obj = try {
-            Json.parseToJsonElement(jsonStr).jsonObject
+        return try {
+            val obj = Json.parseToJsonElement(jsonStr).jsonObject
+
+            val scoresObj = obj["scores"]?.let { elem ->
+                runCatching { elem.jsonObject }.getOrNull()
+            }
+            val winnerLetter = obj["winner"]?.let { elem ->
+                runCatching { elem.jsonPrimitive.content.trim() }.getOrNull()
+            }
+            val rawRationale = obj["rationale"]?.let { elem ->
+                runCatching { elem.jsonPrimitive.content }.getOrNull()
+            } ?: "LLM judge evaluated answers."
+
+            var deanonRationale = rawRationale
+            letterMap.forEach { (letter, pid) ->
+                deanonRationale = deanonRationale
+                    .replace(Regex("""\b(?:Answer|Contender)\s+$letter\b""", RegexOption.IGNORE_CASE), pid.displayName)
+                    .replace("'$letter'", pid.displayName)
+                    .replace("\"$letter\"", pid.displayName)
+                    .replace("($letter)", "(${pid.displayName})")
+                if (letter != "A") {
+                    deanonRationale = deanonRationale.replace(Regex("""\b$letter\b"""), pid.displayName)
+                } else {
+                    deanonRationale = deanonRationale.replace(Regex("""\bA's\b"""), "${pid.displayName}'s")
+                }
+            }
+
+            val fused = obj["fused"]?.let { elem ->
+                runCatching { elem.jsonPrimitive.content.takeIf { it.isNotBlank() } }.getOrNull()
+            }
+
+            val llmScores = mutableMapOf<ProviderId, Float>()
+            scoresObj?.forEach { (letter, element) ->
+                val pid = letterMap[letter.uppercase()] ?: return@forEach
+                val num = runCatching { element.jsonPrimitive.content.toFloatOrNull() }.getOrNull() ?: 0f
+                llmScores[pid] = num
+            }
+
+            val updatedScores = fastVerdict.scores.map { s ->
+                val llm = llmScores[s.providerId]
+                if (llm != null) {
+                    s.copy(score = llm, llmScore = llm)
+                } else {
+                    s
+                }
+            }.sortedByDescending { it.score }
+
+            val winner = (winnerLetter?.let { letterMap[it.uppercase()] })
+                ?: updatedScores.firstOrNull()?.providerId
+                ?: fastVerdict.winner
+
+            JudgeVerdict(
+                winner = winner,
+                scores = updatedScores,
+                rationale = deanonRationale,
+                fusedAnswer = fused,
+            )
         } catch (e: Exception) {
-            return fastVerdict.copy(rationale = "${fastVerdict.rationale} (LLM judge JSON parse error)")
+            fastVerdict.copy(rationale = "${fastVerdict.rationale} (LLM judge JSON parse error)")
         }
-
-        val scoresObj = obj["scores"]?.jsonObject
-        val winnerLetter = obj["winner"]?.jsonPrimitive?.content?.trim()
-        val rawRationale = obj["rationale"]?.jsonPrimitive?.content ?: "LLM judge evaluated answers."
-        var deanonRationale = rawRationale
-        letterMap.forEach { (letter, pid) ->
-            deanonRationale = deanonRationale
-                .replace(Regex("""\b(?:Answer|Contender)\s+$letter\b""", RegexOption.IGNORE_CASE), pid.displayName)
-                .replace("'$letter'", pid.displayName)
-                .replace("\"$letter\"", pid.displayName)
-                .replace("($letter)", "(${pid.displayName})")
-            if (letter != "A") {
-                deanonRationale = deanonRationale.replace(Regex("""\b$letter\b"""), pid.displayName)
-            } else {
-                deanonRationale = deanonRationale.replace(Regex("""\bA's\b"""), "${pid.displayName}'s")
-            }
-        }
-
-        val fused = obj["fused"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() }
-
-        val llmScores = mutableMapOf<ProviderId, Float>()
-        scoresObj?.forEach { (letter, element) ->
-            val pid = letterMap[letter.uppercase()] ?: return@forEach
-            val num = element.jsonPrimitive.content.toFloatOrNull() ?: 0f
-            llmScores[pid] = num
-        }
-
-        val updatedScores = fastVerdict.scores.map { s ->
-            val llm = llmScores[s.providerId]
-            if (llm != null) {
-                s.copy(score = llm, llmScore = llm)
-            } else {
-                s
-            }
-        }.sortedByDescending { it.score }
-
-        val winner = (winnerLetter?.let { letterMap[it.uppercase()] })
-            ?: updatedScores.firstOrNull()?.providerId
-            ?: fastVerdict.winner
-
-        return JudgeVerdict(
-            winner = winner,
-            scores = updatedScores,
-            rationale = deanonRationale,
-            fusedAnswer = fused,
-        )
     }
 
     companion object {

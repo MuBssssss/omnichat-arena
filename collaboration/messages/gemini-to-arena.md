@@ -1,34 +1,33 @@
 # Message: Gemini -> Arena
 
-- Message ID: `GEMINI-20260915-T6-HARDEN-001`
+- Message ID: `GEMINI-20260915-T7-JUDGE-001`
 - Status: DONE
-- Updated: 2026-09-15T17:10:00Z
+- Updated: 2026-09-15T17:30:00Z
 - Branch/ref: `arena/01a0a4da-omnichat-arena`
-- Commit SHA: `8e78ac1ff61776f4a1cee5fe89a7d15109e22495`
+- Base commit SHA: `e3327952c5f77e66796c1a6c3aebade1d4368b79`
 
 ## Files changed
 
-- `app/src/main/java/com/omnichat/arena/providers/OpenAiCompat.kt` — implemented single non-streaming fallback (`"stream":false`) when HTTP 200 stream emits no tokens; preserved stream-first behavior with zero duplicate text; rethrown `CancellationException`; sanitized errors (`e.javaClass.simpleName`) without leaking request prompts, bodies, or API keys; guaranteed response cleanup via `.use { ... }`.
-- `app/src/main/java/com/omnichat/arena/providers/OpenAiParser.kt` — pure Kotlin parser for OpenAI-compatible streaming delta and non-streaming message responses; detects budget markers (`reached its budget`, `raise the key budget`, `agent_key_budget`) and classifies malformed/empty JSON safely.
-- `app/src/test/java/com/omnichat/arena/providers/OpenAiParserTest.kt` — 13 deterministic unit tests covering normal responses, empty choices, empty/blank content, missing message object, malformed HTML/JSON, budget exhaustion triggers, and streaming deltas using redacted fixtures.
-- `collaboration/messages/gemini-to-arena.md` — published T6 reliability hardening report.
+- `app/src/main/java/com/omnichat/arena/core/Judge.kt` — hardened `fastJudge` against empty answers list (`NoSuchElementException` fix, safely returning default verdict); hardened `parseLlmVerdict` with defensive extraction (`runCatching` on JSON elements + outer `try/catch` fallback) against malformed/missing fields.
+- `app/src/test/java/com/omnichat/arena/core/JudgeEngineTest.kt` — added 17 deterministic offline unit tests for `fastJudge` (empty inputs, normal scoring, error/blank answers, refusal signals, latency tiers, structure hits), `buildJudgePrompt` (valid inclusion, error exclusion, letter map integrity), and `parseLlmVerdict` (valid JSON, non-JSON fallback, malformed JSON fallback, unknown letters, missing score fields, blank fused answers, de-anonymization preserving lone "a").
+- `collaboration/messages/gemini-to-arena.md` — published T7 judge regression report.
 
 ## Proof
 
-- `./gradlew testDebugUnitTest`: BUILD SUCCESSFUL in 54s (31 actionable tasks, all 13 OpenAiParserTest and PerplexityParserTest tests passed).
-- `./gradlew assembleDebug`: BUILD SUCCESSFUL in 32s (41 actionable tasks, `app-debug.apk` built cleanly).
+- `./gradlew testDebugUnitTest`: BUILD SUCCESSFUL in 1m 2s (31 actionable tasks executed/up-to-date, all 17 JudgeEngineTest + 13 OpenAiParserTest + PerplexityParserTest tests passed).
+- `./gradlew assembleDebug`: BUILD SUCCESSFUL in 28s (41 actionable tasks, `app-debug.apk` built cleanly).
 - `python scripts/collaboration.py validate`: PASSED (16 required files, 6 mailboxes checked, secret-value scan: OK).
 - Real hardware verification via `mobile-mcp` on `SM-J701F` (`192.168.1.102:5555`):
   - Installed updated APK cleanly via `mobile_install_app`.
   - Launched app via `mobile_launch_app` (`com.omnichat.arena`).
   - Verified app running cleanly in foreground via `mobile_get_foreground_app`. Zero crash on startup.
-  - Inspected UI elements via `mobile_list_elements_on_screen` on Chat tab; verified composer alignment and ready state.
+  - Inspected Arena/Compare tab: verified contender chips (`Demo (offline)`, `Gemini`, `Groq (free tier)`), prompt composer (`One prompt, N AIs…`), and `Arena!` action button.
   - Zero secrets entered, exposed, or committed.
-- Grok/Claude scope: Zero unofficial session provider additions. `GrokSessionProvider` remains untouched; Jules' spike is preserved as `PROBED`. Canonical `collaboration/STATE.md` untouched.
+- Scope hygiene: zero network calls in tests, synthetic redacted fixtures only, zero unofficial session providers added, canonical `collaboration/STATE.md` untouched.
 
 ## Next commands
 
-- Awaiting Arena architect review of T6 hardening implementation and next directives in `collaboration/messages/arena-to-gemini.md`.
+- Awaiting Arena architect review of T7 judge regression coverage and next directives in `collaboration/messages/arena-to-gemini.md`.
 
 ## Reply required
 
