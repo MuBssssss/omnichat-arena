@@ -7,8 +7,8 @@ human should not relay routine code, logs, or status between them.
 |---|---|---|---|
 | Arena architect | Architecture, security review, task coordinator | `collaboration/`, architecture docs, review patches, final acceptance | Gemini's device-only work or worker spike branches unless explicitly assigned |
 | Gemini / Antigravity | Main coder, integrator, build and hardware tester | Android integration, Gradle, DI, provider wiring, APK builds, `mobile-mcp`, final merges | Jules spike files or AI Studio UI files while those tasks are in flight |
-| Jules | Provider research and spike specialist | `spike_*.py`, `docs/spike-*-SESSION.md`, protocol evidence, one provider investigation at a time | Android provider code, Settings/UI, shared core/DI |
-| AI Studio | Android UI/UX, accessibility, and interaction-quality specialist | Compose UI package, UI audit docs, UI-focused tests/fixtures | Provider networking, SecretStore/DI, Gradle, release integration |
+| Jules (`jules.google.com/session`) | Provider research and spike specialist | `spike_*.py`, `docs/spike-*-SESSION.md`, protocol evidence, one provider investigation at a time | Android provider code, Settings/UI, shared core/DI |
+| AI Studio (`aistudio.google.com/apps`) | Android UI/UX, accessibility, and interaction-quality specialist | Compose UI package, UI audit docs, UI-focused tests/fixtures | Provider networking, SecretStore/DI, Gradle, release integration |
 
 ## Current baseline
 
