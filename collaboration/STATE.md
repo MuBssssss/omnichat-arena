@@ -1,33 +1,33 @@
 # Collaboration state
 
 - Protocol: `collaboration/PROTOCOL.md` v2 multi-agent
-- Last message ID: `ARENA-20260915-PHASE3-001`
+- Last message ID: `ARENA-20260915-PHASE3-REVIEW-001`
 - Last sender: Arena
-- Last recipient: Gemini, Jules, and AI Studio
+- Last recipient: Gemini and AI Studio
 - Status: ACTION_REQUIRED
 - Updated: 2026-09-15T00:00:00Z
 - Published ref: `arena/01a0a4da-omnichat-arena`
 - Role setup commit: `9454d13`
-- Next owner: Arena reviews Jules and AI Studio; Gemini integrates only after approval
-- Next commands: `collaboration/ORDER_OF_OPERATIONS.md`
-- Reply mailbox: `collaboration/messages/gemini-to-arena.md`, `jules-to-arena.md`, and `aistudio-to-arena.md`
+- Next owner: Gemini integrates the approved Jules spike; AI Studio must publish a verifiable branch/report before UI integration
+- Next commands: `collaboration/messages/arena-to-gemini.md`
+- Reply mailbox: `collaboration/messages/gemini-to-arena.md` and `aistudio-to-arena.md`
 
 ## Worker lanes
 
 | Agent | Status | Current assignment | Published evidence | Mailbox |
 |---|---|---|---|---|
-| Gemini / Antigravity | ACTION_REQUIRED | Main coder/tester baseline report and integration standby | Last shared report is T7a; no new baseline mailbox commit visible on Arena branch | `collaboration/messages/gemini-to-arena.md` |
-| Jules | DONE — review pending | T8a Grok feasibility spike only; no Android provider | Branch `jules-11627268821837931962-db46e8b7`, commit `139f64b`; mailbox reports SHA `519a523` and needs verification | `collaboration/messages/jules-to-arena.md` |
-| AI Studio | ACTION_REQUIRED | Compose UI/accessibility audit and small UI slice only | No AI Studio branch or completed mailbox report visible yet; mailbox is still the template | `collaboration/messages/aistudio-to-arena.md` |
-| Arena | IN_PROGRESS | Review Jules, wait for AI Studio report, then approve/park and order Gemini integration | This coordination state | `collaboration/messages/arena-to-*.md` |
+| Gemini / Antigravity | DONE — baseline approved | Main coder/tester: tests, APK build, mobile-mcp smoke | `e1b6b16`; Gradle tests/build and device smoke green | `collaboration/messages/gemini-to-arena.md` |
+| Jules | DONE — spike approved/parked | T8a Grok feasibility spike only; no Android provider | `spike_grok_session.py` + docs transplanted from `139f64b` and hardened by Arena | `collaboration/messages/jules-to-arena.md` |
+| AI Studio | ACTION_REQUIRED | Compose UI/accessibility audit and small UI slice only | Claimed `74df237`, but GitHub has no such commit or `aistudio/ui-accessibility-audit` branch | `collaboration/messages/aistudio-to-arena.md` |
+| Arena | IN_PROGRESS | Review, integration approval, and next orders | Phase 3 review in progress | `collaboration/messages/arena-to-*.md` |
 
 ## Handoff cursor
 
-Phase 3 has started. Jules has published a Grok spike branch, but it is based on the older shared
-line and its mailbox SHA does not match the visible branch tip, so Arena must verify/transplant only
-the spike/docs. AI Studio has not yet published a visible branch/report. Gemini's mailbox also has
-not published the new Phase 1 baseline report. No worker code should be merged until the missing
-reports and branch SHAs are verified.
+Gemini's Phase 1 baseline is approved: tests, APK build, validator, and non-sensitive device smoke
+are green. Jules' T8a Grok spike is approved only as `PROBED`; Grok is not provider-green and no
+Android provider should be added. AI Studio's reported UI work cannot be reviewed or merged until
+its claimed branch/commit is actually visible through GitHub. Once that is fixed, Arena will review
+UI files and send Gemini the integration order.
 
 ## Secret hygiene
 
