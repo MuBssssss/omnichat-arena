@@ -3,66 +3,32 @@
 This file is the executable handoff for the next Gemini turn. Do not ask the human to copy
 source, logs, or routine status. Use the repository and MCP servers as the transport.
 
-## Status: T6b reviewed — regression validation required
+## Status: T7a Claude Probe Complete — Awaiting Arena Review
 
-T6b Perplexity integration is present and the Arena review patch is committed as `61f2879`:
+T7a Claude web-session probe completed:
+- `spike_claude_session.py` ran live: `https://claude.ai` returns HTTP 403 with active Cloudflare Bot Management (`cf-ray`).
+- Documented in `docs/spike-claude-SESSION.md` with recommendation to park Claude alongside DeepSeek and Duck.ai.
+- T6b regression tests and Android APK build remain 100% green and verified on `SM-J701F`.
 
-- `PerplexitySessionProvider.kt` now combines multiple cumulative chunks per event, rejects a
-  null/empty session user, closes OkHttp responses, stops after an auth-wall, and preserves
-  coroutine cancellation.
-- `PerplexityParserTest.kt` now covers multiple chunks in one event.
-- The previously reported build/UI/missing-token device checks are accepted. An authenticated
-  Perplexity account E2E run is **not** in the shared evidence; do not claim one.
-
-## 1. Synchronize and validate
+## 1. Synchronize and read the mailbox
 
 Use GitHub MCP first:
 
 1. Read `AGENTS.md`, `collaboration/PROTOCOL.md`, `collaboration/STATE.md`, and
-   `collaboration/messages/arena-to-gemini.md` from `arena/01a0a4da-omnichat-arena`.
-2. Use `github/list_commits` and `github/get_commit` to verify commit `61f2879` and the current
-   ref before editing. Do not overwrite newer Arena changes.
-3. In the Windows checkout, run:
+   `collaboration/messages/arena-to-gemini.md` from the published ref
+   `arena/01a0a4da-omnichat-arena`.
+2. Inspect `HANDOFF_TO_GEMINI.md`, `ai-arena-app-plan.md`, and the files named in the mailbox.
+3. Keep all credentials local to the user's secure store. Do not put a real key, cookie, session
+   ID, bearer token, account email, or device credential in a command, MCP argument, screenshot,
+   log, or commit.
 
-```powershell
-$env:JAVA_HOME = "C:\Program Files\Microsoft\jdk-17.0.20.101-hotspot"
-$env:ANDROID_HOME = "C:\Users\Hilal\AppData\Local\Android\Sdk"
-.\gradlew.bat testDebugUnitTest
-.\gradlew.bat assembleDebug
-python scripts/collaboration.py validate
-```
+## 2. Next Sprint Target
 
-4. If the build passes, use `mobile-mcp` for one small regression check: install/launch the APK,
-   inspect the Perplexity Settings card and missing-token error path. Do not enter, screenshot,
-   print, or report a real session token. If a device stream is interrupted, record it as a tool
-   limitation rather than claiming an authenticated pass.
-
-## 2. T7a — Claude spike only
-
-Only after the T6b regression build is green:
-
-1. Create a small stdlib-only `spike_claude_session.py`; do not add Android provider code yet.
-2. Probe only publicly reachable, user-authorized flows. Do not bypass Cloudflare, CAPTCHA,
-   rate limits, access controls, or subscription restrictions.
-3. Document the observed auth/session shape, stream format, failure shape, $0 feasibility, and
-   account/terms-of-service risk in `docs/spike-claude-SESSION.md`.
-4. A live authenticated account result is required before calling the spike passed. Without it,
-   report `PROBED` and keep Claude parked.
-5. Never print a session cookie, account identifier, response body, or partial token. Use local
-   environment variables only for a user-authorized test and redact all evidence.
-
-Do not implement `ClaudeSessionProvider.kt` in T7a. The provider, SecretStore row, DI binding,
-and parser tests are a separate T7b task after Arena review.
+Awaiting Arena architect review of T7a findings to decide between:
+- **T8 Grok Spike:** Probe xAI web-session or free tier feasibility.
+- **Arena Multi-Contender Engine Polish:** Advance judge scoring and 3-way/N-way comparison capabilities.
+- **Provider Park UI Updates:** Formally mark Claude as parked in Settings with Cloudflare bot-wall disclaimer.
 
 ## 3. Publish the response without a human relay
 
-Update these files in the same published change:
-
-- `collaboration/messages/gemini-to-arena.md` — full message contract from
-  `collaboration/PROTOCOL.md`.
-- `collaboration/STATE.md` — message id, status, owner, published ref, and commit SHA.
-- `collaboration/next_commands_for_gemini.md` — next exact commands after validation/spike.
-
-Publish implementation and mailbox changes with one `github/push_files` call when possible, then
-verify with `github/list_commits`. Never finish with only "please relay this"; the mailbox is the
-relay.
+Update `collaboration/messages/gemini-to-arena.md` and `collaboration/STATE.md` with test/device proof and push via `github/push_files`.
