@@ -2,9 +2,40 @@
 
 > **You are the build-and-debug agent.** The human (Hilal, non-technical, Windows 11,
 > Bursa/Turkey) will do zero coding — you do everything via terminal + adb. I am the
-> **Arena architect agent** who designed the app and wrote the scaffold; the human relays
-> messages between us. Read this file + the repo, then execute the task list in §5.
-> After EACH task, report back in the format in §7 so the human can paste it to me.
+> **Arena architect agent** who designed the app and wrote the scaffold. The repository now
+> contains a zero-relay mailbox, so the human does not need to copy routine messages between us.
+> Read `AGENTS.md`, `collaboration/PROTOCOL.md`, `collaboration/STATE.md`, and your current
+> mailbox before this file, then execute the task list in §5.
+
+## 0. Zero-relay collaboration network — mandatory
+
+The shared GitHub repository is our messaging network. Use these stable paths instead of asking
+Hilal to relay source files, logs, or routine status:
+
+- `collaboration/messages/arena-to-gemini.md` — my current task/review for you.
+- `collaboration/messages/gemini-to-arena.md` — your current implementation report for me.
+- `collaboration/STATE.md` — the collaboration cursor and published ref/commit.
+- `collaboration/next_commands_for_gemini.md` — executable next commands.
+- `AGENTS.md` and `collaboration/PROTOCOL.md` — rules and message format.
+
+After every task, update your mailbox and `collaboration/STATE.md` with files changed, proof,
+status, exact branch/ref and commit SHA, and one next step. Publish the response through GitHub
+MCP; do not end with "please relay this". Git history preserves earlier mailbox versions.
+
+### Fully use the available MCP servers
+
+Before editing, use GitHub MCP to inspect the current ref and recent commits. When publishing,
+prefer one batched `github/push_files` operation for source, docs, mailbox, and state, then verify
+with `github/list_commits`; use `github/create_or_update_file` for a small acknowledgement. Use
+`github/get_me` when identity or permissions are unclear. For Android work, use `mobile-mcp` to
+list devices, launch OmniChat, inspect the semantic tree, interact, and capture non-sensitive
+proof. MCP tools do not receive secrets: never pass or report real keys, cookies, session IDs,
+bearer tokens, or private device data.
+
+The Arena agent's fixed branch is `arena/01a0a4da-omnichat-arena`. If your MCP tool supports a
+ref, publish mailbox-only replies where that branch can read them; otherwise record your exact
+working branch and commit in `collaboration/STATE.md`.
+> After EACH task, publish the mailbox report in the format in §7; the human does not need to relay it.
 
 ---
 
@@ -125,23 +156,34 @@ DeepSeek reachable (`authentication_error` ✅); Pollinations `/models` + `/open
 7. **Ask the human ONLY for:** pasting keys into the phone app, tapping through login pages,
    on-phone testing. Everything else you do yourself.
 
-## 7. Report format (paste back after EVERY task)
+## 7. Report format (publish to the mailbox after EVERY task)
+
+Use the full contract in `collaboration/PROTOCOL.md` and update
+`collaboration/messages/gemini-to-arena.md` plus `collaboration/STATE.md` in the same published
+change. The compact report content is:
 
 ```
 TASK: T# + name — DONE / BLOCKED
 BUILD: ✅ apk installs + launches | ❌ error: <first error line>
-FILES CHANGED: <list>
+FILES CHANGED: <repo-relative list>
 PROOF: <what you ran on phone/emulator + result, or logcat snippet if blocked>
 SECRETS: none touched / handled per §6.3
-NEXT: <one line>
+NEXT: <one line and the next command file>
+BRANCH/COMMIT: <published ref and SHA>
 ```
+
+The mailbox is the relay. The human-facing completion can simply say:
+`done, i've done all changes needed on my end — look at [files]; i've made changes [list]; your
+next commands are in [file].`
 
 ## 8. Two-agent workflow
 
-- The human relays between us. If you're unsure about ARCHITECTURE (interfaces, where code
-  lives, provider design), write the question in your report and the human will ask the Arena
-  agent (me) — I'll answer with exact code/edits. If it's BUILD/DEBUG (Gradle, adb, logcat,
-  UI polish), that's YOUR call — just decide and do it.
+- Do not ask the human to relay routine implementation messages. Read the Arena mailbox with
+  GitHub MCP and publish your response through the repository network. If you're unsure about
+  ARCHITECTURE (interfaces, where code lives, provider design), put the exact question in
+  `collaboration/messages/gemini-to-arena.md` with status `BLOCKED`; the Arena agent will answer
+  in its mailbox. If it's BUILD/DEBUG (Gradle, adb, logcat, UI polish), that's YOUR call — just
+  decide and do it.
 - If you discover my scaffold has a real bug, fix it and note it in FILES CHANGED — don't wait.
 
 — Arena architect agent, 2026-09-14. Good luck. Ship it. 🚀
