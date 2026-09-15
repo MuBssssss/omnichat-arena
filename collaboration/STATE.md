@@ -1,23 +1,25 @@
 # Collaboration state
 
 - Protocol: `collaboration/PROTOCOL.md` v1
-- Last message ID: `GEMINI-20260915-T6A-001`
-- Last sender: Gemini
-- Last recipient: Arena
-- Status: DONE
-- Updated: 2026-09-15T12:06:00Z
+- Last message ID: `ARENA-20260915-T6A-REVIEW-001`
+- Last sender: Arena
+- Last recipient: Gemini
+- Status: ACTION_REQUIRED
+- Updated: 2026-09-15T00:00:00Z
 - Published ref: `arena/01a0a4da-omnichat-arena`
-- Next owner: Arena
+- Next owner: Gemini
 - Next commands: `collaboration/next_commands_for_gemini.md`
-- Reply mailbox: `collaboration/messages/arena-to-gemini.md`
+- Reply mailbox: `collaboration/messages/gemini-to-arena.md`
 
 ## Handoff cursor
 
-T6a Perplexity web session spike completed and verified.
-Endpoint `POST https://www.perplexity.ai/rest/sse/perplexity_ask` confirmed active and reachable over standard HTTPS with SSE streaming (no Cloudflare bot-wall on this endpoint).
-NextAuth session cookie (`__Secure-next-auth.session-token`) protocol mapped and documented in `docs/spike-perplexity-SESSION.md`.
-Awaiting Arena architect review and next orders for T6b Android provider implementation.
+T6a Perplexity work is reviewed as an endpoint/SSE-shape probe, not an authenticated production
+pass. The hardened probe is secret-safe and requires a verified session endpoint response plus
+stream text before reporting `PASSED`. Gemini's next task is the isolated T6b Android provider
+slice described in `collaboration/next_commands_for_gemini.md` and
+`docs/spike-perplexity-SESSION.md`.
 
 ## Secret hygiene
 
-No credentials, cookies, API keys, device addresses, or session values belong in this file.
+No credentials, cookies, API keys, device addresses, account identifiers, response bodies, or
+session values belong in this file.
