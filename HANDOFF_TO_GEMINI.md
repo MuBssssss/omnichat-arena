@@ -12,15 +12,21 @@
 The shared GitHub repository is our messaging network. Use these stable paths instead of asking
 Hilal to relay source files, logs, or routine status:
 
+- `collaboration/AGENT_ROLES.md` — the four-agent roster, ownership boundaries, and current baseline.
+- `collaboration/ORDER_OF_OPERATIONS.md` — the parallel launch and merge order.
 - `collaboration/messages/arena-to-gemini.md` — my current task/review for you.
 - `collaboration/messages/gemini-to-arena.md` — your current implementation report for me.
-- `collaboration/STATE.md` — the collaboration cursor and published ref/commit.
+- `collaboration/messages/arena-to-jules.md` and `jules-to-arena.md` — Jules' spike task/report.
+- `collaboration/messages/arena-to-aistudio.md` and `aistudio-to-arena.md` — AI Studio's UI task/report.
+- `collaboration/STATE.md` — the canonical cursor, owned by Arena during parallel work.
 - `collaboration/next_commands_for_gemini.md` — executable next commands.
-- `AGENTS.md` and `collaboration/PROTOCOL.md` — rules and message format.
+- `collaboration/prompts/GEMINI_ANTIGRAVITY.md` — your copy-paste role brief.
 
-After every task, update your mailbox and `collaboration/STATE.md` with files changed, proof,
-status, exact branch/ref and commit SHA, and one next step. Publish the response through GitHub
-MCP; do not end with "please relay this". Git history preserves earlier mailbox versions.
+After every task, update your own mailbox with files changed, proof, status, exact branch/ref and
+commit SHA, and one next step. Do not overwrite the canonical `collaboration/STATE.md` while
+workers are parallel; Arena updates that cursor after reviewing all worker mailboxes. Publish the
+response through GitHub MCP; do not end with "please relay this". Git history preserves earlier
+mailbox versions.
 
 ### Fully use the available MCP servers
 
@@ -32,9 +38,9 @@ list devices, launch OmniChat, inspect the semantic tree, interact, and capture 
 proof. MCP tools do not receive secrets: never pass or report real keys, cookies, session IDs,
 bearer tokens, or private device data.
 
-The Arena agent's fixed branch is `arena/01a0a4da-omnichat-arena`. If your MCP tool supports a
-ref, publish mailbox-only replies where that branch can read them; otherwise record your exact
-working branch and commit in `collaboration/STATE.md`.
+The Arena agent's fixed branch is `arena/01a0a4da-omnichat-arena`. Use your own integration
+branch when possible, record the exact branch/ref and commit in your mailbox, and publish mailbox-
+only replies where the Arena agent can read them.
 > After EACH task, publish the mailbox report in the format in §7; the human does not need to relay it.
 
 ---
@@ -176,14 +182,21 @@ The mailbox is the relay. The human-facing completion can simply say:
 `done, i've done all changes needed on my end — look at [files]; i've made changes [list]; your
 next commands are in [file].`
 
-## 8. Two-agent workflow
+## 8. Four-agent workflow
 
-- Do not ask the human to relay routine implementation messages. Read the Arena mailbox with
-  GitHub MCP and publish your response through the repository network. If you're unsure about
-  ARCHITECTURE (interfaces, where code lives, provider design), put the exact question in
-  `collaboration/messages/gemini-to-arena.md` with status `BLOCKED`; the Arena agent will answer
-  in its mailbox. If it's BUILD/DEBUG (Gradle, adb, logcat, UI polish), that's YOUR call — just
-  decide and do it.
-- If you discover my scaffold has a real bug, fix it and note it in FILES CHANGED — don't wait.
+- Gemini/Antigravity is the main Android coder, integrator, build owner, and physical-device
+  tester. Do not ask the human to relay routine implementation messages.
+- Jules is the provider-research/spike specialist. Read `collaboration/messages/jules-to-arena.md`
+  and do not overwrite Jules-owned spike/docs files while a task is in flight.
+- AI Studio is the Android UI/UX and accessibility specialist. Read
+  `collaboration/messages/aistudio-to-arena.md` and do not overwrite its Compose UI/audit files
+  while a task is in flight.
+- Arena reviews worker mailboxes, owns `collaboration/STATE.md`, approves merges, and assigns the
+  next parallel batch. Read `collaboration/ORDER_OF_OPERATIONS.md` before integrating.
+- If unsure about ARCHITECTURE, put the exact question in `collaboration/messages/gemini-to-arena.md`
+  with status `BLOCKED`; the Arena agent will answer in its mailbox. If it's BUILD/DEBUG (Gradle,
+  adb, logcat, device UI), that's YOUR call — decide and do it.
+- If you discover a real bug, fix it and note it in FILES CHANGED — don't wait, but keep ownership
+  boundaries and publish the fix for Arena review.
 
 — Arena architect agent, 2026-09-14. Good luck. Ship it. 🚀

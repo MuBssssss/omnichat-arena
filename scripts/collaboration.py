@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Small, dependency-free checks for the repository-backed agent mailbox.
+"""Small, dependency-free checks for the repository-backed multi-agent mailbox.
 
 Usage:
     python3 scripts/collaboration.py validate
@@ -19,15 +19,28 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_FILES = (
     "AGENTS.md",
+    "collaboration/AGENT_ROLES.md",
     "collaboration/PROTOCOL.md",
+    "collaboration/ORDER_OF_OPERATIONS.md",
     "collaboration/STATE.md",
     "collaboration/next_commands_for_gemini.md",
+    "collaboration/prompts/JULES.md",
+    "collaboration/prompts/AI_STUDIO.md",
+    "collaboration/prompts/GEMINI_ANTIGRAVITY.md",
     "collaboration/messages/arena-to-gemini.md",
     "collaboration/messages/gemini-to-arena.md",
+    "collaboration/messages/arena-to-jules.md",
+    "collaboration/messages/jules-to-arena.md",
+    "collaboration/messages/arena-to-aistudio.md",
+    "collaboration/messages/aistudio-to-arena.md",
 )
 MESSAGE_FILES = (
     "collaboration/messages/arena-to-gemini.md",
     "collaboration/messages/gemini-to-arena.md",
+    "collaboration/messages/arena-to-jules.md",
+    "collaboration/messages/jules-to-arena.md",
+    "collaboration/messages/arena-to-aistudio.md",
+    "collaboration/messages/aistudio-to-arena.md",
 )
 REQUIRED_MESSAGE_HEADINGS = (
     "## Files changed",
@@ -102,6 +115,7 @@ def status() -> int:
         "Last recipient:",
         "Status:",
         "Published ref:",
+        "Last commit:",
         "Next owner:",
         "Next commands:",
         "Reply mailbox:",

@@ -1,34 +1,64 @@
 # Next commands for Gemini
 
-This file is the executable handoff for the next Gemini turn. Do not ask the human to copy
-source, logs, or routine status. Use the repository and MCP servers as the transport.
+This file is the executable handoff for Gemini/Antigravity. Do not ask the human to copy source,
+logs, or routine status. Use the repository and MCP servers as the transport.
 
-## Status: T7a Claude Probe Complete — Awaiting Arena Review
+## Current team and ownership
 
-T7a Claude web-session probe completed:
-- `spike_claude_session.py` ran live: `https://claude.ai` returns HTTP 403 with active Cloudflare Bot Management (`cf-ray`).
-- Documented in `docs/spike-claude-SESSION.md` with recommendation to park Claude alongside DeepSeek and Duck.ai.
-- T6b regression tests and Android APK build remain 100% green and verified on `SM-J701F`.
+- Arena: architecture/security coordinator and merge reviewer; owns `collaboration/STATE.md`.
+- Gemini/Antigravity: main Android coder, integrator, Gradle owner, and physical-device tester.
+- Jules: provider-research/spike specialist; owns only `spike_*.py` and spike docs in the first pass.
+- AI Studio: Android UI/UX/accessibility specialist; owns Compose UI/audit files in the first pass.
 
-## 1. Synchronize and read the mailbox
+Read `collaboration/AGENT_ROLES.md`, `collaboration/ORDER_OF_OPERATIONS.md`, and
+`collaboration/prompts/GEMINI_ANTIGRAVITY.md` before editing.
+
+## 1. Baseline now
 
 Use GitHub MCP first:
 
-1. Read `AGENTS.md`, `collaboration/PROTOCOL.md`, `collaboration/STATE.md`, and
-   `collaboration/messages/arena-to-gemini.md` from the published ref
-   `arena/01a0a4da-omnichat-arena`.
-2. Inspect `HANDOFF_TO_GEMINI.md`, `ai-arena-app-plan.md`, and the files named in the mailbox.
-3. Keep all credentials local to the user's secure store. Do not put a real key, cookie, session
-   ID, bearer token, account email, or device credential in a command, MCP argument, screenshot,
-   log, or commit.
+1. Read the current `arena/01a0a4da-omnichat-arena` ref, recent commits, all three incoming task
+   mailboxes, and the role/prompt files.
+2. Run the Windows regression suite on the current baseline:
 
-## 2. Next Sprint Target
+```powershell
+$env:JAVA_HOME = "C:\Program Files\Microsoft\jdk-17.0.20.101-hotspot"
+$env:ANDROID_HOME = "C:\Users\Hilal\AppData\Local\Android\Sdk"
+.\gradlew.bat testDebugUnitTest
+.\gradlew.bat assembleDebug
+python scripts/collaboration.py validate
+```
 
-Awaiting Arena architect review of T7a findings to decide between:
-- **T8 Grok Spike:** Probe xAI web-session or free tier feasibility.
-- **Arena Multi-Contender Engine Polish:** Advance judge scoring and 3-way/N-way comparison capabilities.
-- **Provider Park UI Updates:** Formally mark Claude as parked in Settings with Cloudflare bot-wall disclaimer.
+3. Use `mobile-mcp` for the smallest non-sensitive smoke check. Do not enter, screenshot, print,
+   or report any session token/account identifier.
+4. Publish the result in `collaboration/messages/gemini-to-arena.md` with branch/ref and SHA. Do
+   not edit canonical `collaboration/STATE.md` while Jules and AI Studio are working.
 
-## 3. Publish the response without a human relay
+## 2. Parallel lanes
 
-Update `collaboration/messages/gemini-to-arena.md` and `collaboration/STATE.md` with test/device proof and push via `github/push_files`.
+While the baseline runs or after it is green:
+
+- Jules is doing the T8a Grok feasibility spike in `spike_grok_session.py` and
+  `docs/spike-grok-SESSION.md`. Do not edit those files.
+- AI Studio is doing a Compose UI/accessibility audit and possibly a small UI slice. Do not edit
+  its UI/audit files unless Arena assigns a conflict.
+- Gemini owns build failures, Android integration, DI/provider wiring, APK installation, and
+  `mobile-mcp` acceptance.
+
+Wait for Arena's approval mail before integrating worker branches. Review each diff for secrets,
+$0 compliance, native UI rules, tests, and ownership. Then integrate, run Gradle, and test the
+approved changes on the device.
+
+## 3. Safety constraints
+
+- No paid APIs/SDKs, WebView chat, Cloudflare/CAPTCHA/rate-limit/access-control bypasses, hidden
+  relay, or automatic provider retries that could trigger account protection.
+- Session values are local-only and encrypted. Never print, partially mask, commit, screenshot,
+  or send them to an MCP tool.
+- Keep a provider `PROBED`/`PARKED` if authenticated behavior is not actually proven.
+
+## 4. Publish without a human relay
+
+Update only `collaboration/messages/gemini-to-arena.md` with the protocol headings, exact files,
+proof, next command file, and branch/ref/SHA. Use GitHub MCP `push_files` plus `list_commits` when
+available. Never finish with only "please relay this"; the mailbox is the relay.
