@@ -22,6 +22,7 @@ REQUIRED_FILES = (
     "collaboration/AGENT_ROLES.md",
     "collaboration/PROTOCOL.md",
     "collaboration/ORDER_OF_OPERATIONS.md",
+    "collaboration/HUMAN_LAUNCH_GUIDE.md",
     "collaboration/STATE.md",
     "collaboration/next_commands_for_gemini.md",
     "collaboration/prompts/JULES.md",
