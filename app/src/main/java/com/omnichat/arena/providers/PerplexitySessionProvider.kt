@@ -8,6 +8,7 @@ import com.omnichat.arena.core.ModelInfo
 import com.omnichat.arena.core.ProviderId
 import com.omnichat.arena.core.StreamEvent
 import com.omnichat.arena.data.SecretStore
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -43,26 +44,27 @@ internal object PerplexityParser {
             }
 
             val blocks = root["blocks"]?.jsonArray ?: return ParseResult.NoDelta
+            var current = accumulatedText
+            val delta = StringBuilder()
             for (blockElem in blocks) {
                 val block = blockElem.jsonObject
                 val md = block["markdown_block"]?.jsonObject ?: continue
                 val chunks = md["chunks"]?.jsonArray ?: continue
                 for (chunkElem in chunks) {
                     val chunk = chunkElem.jsonPrimitive.content
-                    if (chunk.isEmpty()) continue
-                    if (chunk.startsWith(accumulatedText)) {
-                        val delta = chunk.substring(accumulatedText.length)
-                        if (delta.isNotEmpty()) {
-                            return ParseResult.TextDelta(delta, chunk)
-                        }
-                    } else if (chunk != accumulatedText) {
-                        val delta = chunk
-                        val newAccumulated = accumulatedText + chunk
-                        return ParseResult.TextDelta(delta, newAccumulated)
+                    if (chunk.isEmpty() || chunk == current || current.startsWith(chunk)) continue
+                    if (chunk.startsWith(current)) {
+                        delta.append(chunk.substring(current.length))
+                        current = chunk
+                    } else {
+                        // Some responses send an incremental chunk instead of the cumulative text.
+                        delta.append(chunk)
+                        current += chunk
                     }
                 }
             }
-            ParseResult.NoDelta
+            if (delta.isNotEmpty()) ParseResult.TextDelta(delta.toString(), current)
+            else ParseResult.NoDelta
         } catch (_: Exception) {
             ParseResult.NoDelta
         }
@@ -114,7 +116,10 @@ class PerplexitySessionProvider @Inject constructor(
                 } else {
                     val body = response.body?.string() ?: ""
                     val root = PerplexityParser.json.parseToJsonElement(body).jsonObject
-                    if (root.containsKey("user")) {
+                    val hasUser = runCatching {
+                        root["user"]?.jsonObject?.isNotEmpty() == true
+                    }.getOrDefault(false)
+                    if (hasUser) {
                         Health(true, "Session active")
                     } else {
                         Health(false, "Session expired or unauthenticated. Re-login required.")
@@ -163,34 +168,36 @@ class PerplexitySessionProvider @Inject constructor(
         var authWallEncountered = false
 
         try {
-            val response = http.newCall(httpRequest).execute()
-            if (!response.isSuccessful) {
-                val code = response.code
-                response.close()
-                if (code == 401 || code == 403) {
-                    emit(StreamEvent.Error("Perplexity: session expired or rejected (HTTP $code). Re-login in Keys tab.", false))
-                } else {
-                    emit(StreamEvent.Error("Perplexity error HTTP $code", true))
-                }
-                return@flow
-            }
-
-            Sse.consume(
-                response = response,
-                onData = { payloadStr ->
-                    when (val res = PerplexityParser.parseLine(payloadStr, accumulated)) {
-                        is PerplexityParser.ParseResult.AuthWall -> {
-                            authWallEncountered = true
-                        }
-                        is PerplexityParser.ParseResult.TextDelta -> {
-                            accumulated = res.newAccumulated
-                            emit(StreamEvent.Token(res.delta))
-                        }
-                        is PerplexityParser.ParseResult.NoDelta -> {}
+            http.newCall(httpRequest).execute().use { response ->
+                if (!response.isSuccessful) {
+                    val code = response.code
+                    if (code == 401 || code == 403) {
+                        emit(StreamEvent.Error("Perplexity: session expired or rejected (HTTP $code). Re-login in Keys tab.", false))
+                    } else {
+                        emit(StreamEvent.Error("Perplexity error HTTP $code", true))
                     }
-                },
-                collector = this
-            )
+                    return@flow
+                }
+
+                Sse.consume(
+                    response = response,
+                    onData = { payloadStr ->
+                        if (!authWallEncountered) {
+                            when (val res = PerplexityParser.parseLine(payloadStr, accumulated)) {
+                                is PerplexityParser.ParseResult.AuthWall -> {
+                                    authWallEncountered = true
+                                }
+                                is PerplexityParser.ParseResult.TextDelta -> {
+                                    accumulated = res.newAccumulated
+                                    emit(StreamEvent.Token(res.delta))
+                                }
+                                is PerplexityParser.ParseResult.NoDelta -> {}
+                            }
+                        }
+                    },
+                    collector = this
+                )
+            }
 
             val latency = System.currentTimeMillis() - t0
             if (authWallEncountered) {
@@ -200,6 +207,8 @@ class PerplexitySessionProvider @Inject constructor(
             } else {
                 emit(StreamEvent.Error("Perplexity: empty response received from server.", true))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             emit(StreamEvent.Error("Perplexity network failure: ${e.javaClass.simpleName}", true))
         }

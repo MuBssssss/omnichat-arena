@@ -34,6 +34,16 @@ class PerplexityParserTest {
     }
 
     @Test
+    fun parseLine_multipleChunksInOneEvent_combinesAllNewText() {
+        val payload = """{"blocks":[{"markdown_block":{"chunks":["Hello", "Hello world", "Hello world!"]}}]}"""
+        val result = PerplexityParser.parseLine(payload, "")
+        assertTrue(result is PerplexityParser.ParseResult.TextDelta)
+        val delta = result as PerplexityParser.ParseResult.TextDelta
+        assertEquals("Hello world!", delta.delta)
+        assertEquals("Hello world!", delta.newAccumulated)
+    }
+
+    @Test
     fun parseLine_duplicateChunk_suppressesDuplicate() {
         val payload = """{"blocks":[{"markdown_block":{"chunks":["Hello world"]}}]}"""
         val result = PerplexityParser.parseLine(payload, "Hello world")
