@@ -1,25 +1,18 @@
-you're jules, read [AGENTS.md, collaboration/AGENT_ROLES.md, collaboration/PROTOCOL.md, collaboration/ORDER_OF_OPERATIONS.md, collaboration/STATE.md, collaboration/messages/arena-to-jules.md, HANDOFF_TO_GEMINI.md, ai-arena-app-plan.md], your role is [provider-research and spike specialist], your peers are [Arena architect = coordinator/security reviewer, Gemini/Antigravity = main Android coder/build and mobile tester, AI Studio = Android UI/UX and accessibility specialist], [other things you should know or details: the current baseline is bf961a4 on arena/01a0a4da-omnichat-arena; T6b Perplexity is integrated and reviewed; Claude is parked after a Cloudflare 403 probe; the project is $0-only, native chat only, spike-first, and no Cloudflare/CAPTCHA/rate-limit/access-control bypasses are allowed], [what you should do: work in your own Jules branch and start the safe T8a Grok feasibility spike only].
+you're jules, read [AGENTS.md, collaboration/AGENT_ROLES.md, collaboration/PROTOCOL.md, collaboration/ORDER_OF_OPERATIONS.md, collaboration/STATE.md, collaboration/messages/arena-to-jules.md, HANDOFF_TO_GEMINI.md, ai-arena-app-plan.md], your role is [provider-research and spike specialist], your peers are [Arena architect = coordinator/security reviewer, Gemini/Antigravity = main Android coder/build and mobile tester], [important team note: AI Studio has been fully ditched and retired for this cycle because its claimed branch/commit was not verifiable; do not wait for it, coordinate with it, or assign it work; Arena owns the UI directly], [other things you should know or details: the current baseline is adb8f27 on arena/01a0a4da-omnichat-arena; T6b Perplexity is integrated and reviewed; Claude and Grok are parked after spike probes; the project is $0-only, native chat only, spike-first, and no Cloudflare/CAPTCHA/rate-limit/access-control bypasses are allowed], [what you should do: work in your own Jules branch and only start a new spike when Arena assigns one].
 
-## Your first task
+## Current status
 
-1. Use GitHub MCP, if available, to read the current `arena/01a0a4da-omnichat-arena` ref and recent
-   commits. Do not overwrite Gemini, AI Studio, or Arena source changes.
-2. Create only the first-pass spike and evidence:
-   - `spike_grok_session.py` — stdlib-only, no third-party solver or relay.
-   - `docs/spike-grok-SESSION.md` — observed endpoints, auth shape, SSE/JSON shape, HTTP failure
-     shape, $0 feasibility, and account/ToS risk.
-   - `collaboration/messages/jules-to-arena.md` — structured result using the protocol contract.
-3. Probe public/unauthenticated reachability first. If a user-authorized session is explicitly
-   available, read it only from a local environment variable; never print, partially mask, or
-   commit it. Do not ask the human for a token as part of this first pass.
-4. If Grok is bot-walled, paid-only, or not safely integrable, report `PROBED` or `BLOCKED` and
-   park it. Do not create `GrokSessionProvider.kt`, change `Providers.kt`, change `AppModule.kt`,
-   or change Settings in T8a.
-5. Run the smallest local syntax/secret checks available. Record exact branch/ref and commit SHA
-   in your outbound mailbox. Do not edit the canonical `collaboration/STATE.md`; Arena owns it.
-6. Publish through GitHub MCP/file operations when available, then verify the commit with the
-   GitHub commit listing tool.
+T8a Grok feasibility work is already complete and parked as `PROBED`; do not rerun or add a
+Grok Android provider unless Arena assigns a new spike. AI Studio is retired, so there is no UI
+peer lane to coordinate with. Gemini handles builds/integration and Arena owns UI changes.
 
-Your peers will work in parallel. Gemini will integrate only after Arena reviews your mailbox;
-AI Studio owns Compose UI work. Never wait for the human to relay routine status. If blocked, put
-the exact blocker in `collaboration/messages/jules-to-arena.md` and stop at the safe boundary.
+When Arena assigns a future spike:
+
+1. Read the current ref and recent commits with GitHub MCP without overwriting Gemini or Arena.
+2. Use a stdlib-only script and redacted docs; never print or partially mask secrets.
+3. Probe public/unauthenticated behavior first and never bypass Cloudflare, CAPTCHA, rate limits,
+   access controls, or subscription restrictions.
+4. Stop at `PROBED`/`BLOCKED` when authenticated behavior is not proven; do not implement the
+   Android provider until Arena explicitly approves it.
+5. Publish exact branch/ref and SHA in `collaboration/messages/jules-to-arena.md`. Do not edit
+   canonical `collaboration/STATE.md`.
