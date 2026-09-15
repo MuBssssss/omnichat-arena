@@ -7,6 +7,7 @@
 - Status: ACTION_REQUIRED
 - Updated: 2026-09-15T00:00:00Z
 - Published ref: `arena/01a0a4da-omnichat-arena`
+- Role setup commit: `9454d13`
 - Next owner: Gemini integrates only after Arena reviews worker mailboxes
 - Next commands: `collaboration/ORDER_OF_OPERATIONS.md`
 - Reply mailbox: `collaboration/messages/gemini-to-arena.md`, `jules-to-arena.md`, and `aistudio-to-arena.md`
