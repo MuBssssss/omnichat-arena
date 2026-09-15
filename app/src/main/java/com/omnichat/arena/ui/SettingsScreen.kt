@@ -50,6 +50,14 @@ class SettingsViewModel @Inject constructor(
         secrets.clearRaw("GEMINI_PSIDTS")
         secrets.clearRaw("GEMINI_SAPISID")
     }
+
+    fun hasPerplexitySession(): Boolean = !secrets.getRaw("PERPLEXITY_SESSION_TOKEN").isNullOrBlank()
+    fun savePerplexitySession(token: String) {
+        if (token.isNotBlank()) secrets.setRaw("PERPLEXITY_SESSION_TOKEN", token.trim())
+    }
+    fun clearPerplexitySession() {
+        secrets.clearRaw("PERPLEXITY_SESSION_TOKEN")
+    }
 }
 
 @Composable
@@ -61,6 +69,7 @@ fun SettingsScreen(mod: Modifier = Modifier, vm: SettingsViewModel = hiltViewMod
     ) {
         Text("Keys & logins (stored encrypted, on-device only)", style = MaterialTheme.typography.titleMedium)
         GeminiSessionCard(vm, tick) { tick++ }
+        PerplexitySessionCard(vm, tick) { tick++ }
         Card(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(10.dp)) {
                 Text("DeepSeek — ⛔ bot-walled, parked")
@@ -85,7 +94,7 @@ fun SettingsScreen(mod: Modifier = Modifier, vm: SettingsViewModel = hiltViewMod
         }
         Card(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(10.dp)) {
-                Text("Perplexity · Claude · Grok 🔜")
+                Text("Claude · Grok 🔜")
                 Text("One provider file + one @Binds line each. See plan doc §9.",
                     style = MaterialTheme.typography.bodySmall)
             }
@@ -155,6 +164,63 @@ private fun GeminiSessionCard(vm: SettingsViewModel, tick: Int, bump: () -> Unit
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Save Session Cookies")
+            }
+        }
+    }
+}
+
+@Composable
+private fun PerplexitySessionCard(vm: SettingsViewModel, tick: Int, bump: () -> Unit) {
+    val ctx = LocalContext.current
+    var token by remember(tick) { mutableStateOf("") }
+    val loggedIn = vm.hasPerplexitySession()
+
+    Card(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    "Perplexity (Web Session) ${if (loggedIn) "✅ Logged in" else "⬜ Not logged in"}",
+                    style = MaterialTheme.typography.titleSmall
+                )
+                if (loggedIn) {
+                    TextButton(onClick = { vm.clearPerplexitySession(); bump() }) {
+                        Text("Log out")
+                    }
+                }
+            }
+            Text(
+                "Unofficial web-session integration ($0-only). Requires __Secure-next-auth.session-token from your logged-in browser session. Never leaves device.",
+                style = MaterialTheme.typography.bodySmall
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.perplexity.ai"))
+                        ctx.startActivity(intent)
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Open Perplexity in Browser")
+                }
+            }
+            OutlinedTextField(
+                value = token,
+                onValueChange = { token = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("__Secure-next-auth.session-token") },
+                visualTransformation = PasswordVisualTransformation(),
+                singleLine = true,
+            )
+            Button(
+                onClick = {
+                    vm.savePerplexitySession(token)
+                    token = ""
+                    bump()
+                },
+                enabled = token.isNotBlank(),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Save Session Token")
             }
         }
     }
