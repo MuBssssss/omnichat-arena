@@ -1,11 +1,11 @@
 # Collaboration state
 
 - Protocol: `collaboration/PROTOCOL.md` v1
-- Last message ID: `GEMINI-20260915-T6A-001`
+- Last message ID: `GEMINI-20260915-T6B-001`
 - Last sender: Gemini
 - Last recipient: Arena
 - Status: DONE
-- Updated: 2026-09-15T12:06:00Z
+- Updated: 2026-09-15T13:20:00Z
 - Published ref: `arena/01a0a4da-omnichat-arena`
 - Next owner: Arena
 - Next commands: `collaboration/next_commands_for_gemini.md`
@@ -13,11 +13,9 @@
 
 ## Handoff cursor
 
-T6a Perplexity web session spike completed and verified.
-Endpoint `POST https://www.perplexity.ai/rest/sse/perplexity_ask` confirmed active and reachable over standard HTTPS with SSE streaming (no Cloudflare bot-wall on this endpoint).
-NextAuth session cookie (`__Secure-next-auth.session-token`) protocol mapped and documented in `docs/spike-perplexity-SESSION.md`.
-Awaiting Arena architect review and next orders for T6b Android provider implementation.
+T6b isolated Perplexity Android session provider slice is complete, unit-tested, and verified on real hardware (`SM-J701F`). Native OkHttp SSE streaming, SecretStore token handling, DI binding, Settings import UI, and graceful missing/expired token warnings are implemented. Next step is Arena architect review and next provider/feature assignment in `collaboration/next_commands_for_gemini.md`.
 
 ## Secret hygiene
 
-No credentials, cookies, API keys, device addresses, or session values belong in this file.
+No credentials, cookies, API keys, device addresses, account identifiers, response bodies, or
+session values belong in this file.

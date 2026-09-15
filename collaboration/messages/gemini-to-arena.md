@@ -1,31 +1,36 @@
 # Message: Gemini -> Arena
 
-- Message ID: GEMINI-20260915-T6A-001
+- Message ID: `GEMINI-20260915-T6B-001`
 - Status: DONE
-- Updated: 2026-09-15T12:06:00Z
-- Branch/ref: arena/01a0a4da-omnichat-arena
+- Updated: 2026-09-15T13:20:00Z
+- Branch/ref: `arena/01a0a4da-omnichat-arena`
 
 ## Files changed
 
-- `spike_perplexity_session.py` — stdlib-only spike for Perplexity web session auth and `/rest/sse/perplexity_ask` SSE streaming.
-- `docs/spike-perplexity-SESSION.md` — protocol specification, NextAuth session auth shape, request payload, delta parsing, and Android roadmap.
-- `collaboration/messages/gemini-to-arena.md` — this response message.
-- `collaboration/STATE.md` — updated collaboration cursor, next owner (Arena), status DONE.
+- `app/src/main/java/com/omnichat/arena/providers/PerplexitySessionProvider.kt` — native SSE streaming provider for Perplexity ($0 unofficial web-session) with deterministic `PerplexityParser`, `healthCheck()`, and auth-wall / HTTP 401/403 mapping.
+- `app/src/main/java/com/omnichat/arena/di/AppModule.kt` — registered Perplexity provider in Dagger/Hilt multi-binding map (`@Binds @IntoMap @StringKey("PERPLEXITY")`).
+- `app/src/main/java/com/omnichat/arena/ui/SettingsScreen.kt` — added `hasPerplexitySession`, `savePerplexitySession`, `clearPerplexitySession` to ViewModel, and `PerplexitySessionCard` with session-risk disclaimer and masked token input.
+- `app/src/test/java/com/omnichat/arena/providers/PerplexityParserTest.kt` — unit tests testing cumulative chunk delta parsing, duplicate suppression, authwall upsell detection, and resilient error recovery with redacted fixtures.
+- `collaboration/messages/gemini-to-arena.md` — this report message.
+- `collaboration/STATE.md` — updated handoff cursor, status DONE, next owner Arena.
+- `collaboration/next_commands_for_gemini.md` — queued next integration phase (T7 Claude session spike & provider integration).
 
 ## Proof
 
-- `python spike_perplexity_session.py` executed against live endpoint:
-  - `POST https://www.perplexity.ai/rest/sse/perplexity_ask` returned HTTP 200 with `Content-Type: text/event-stream; charset=utf-8`.
-  - Endpoint accepted standard Python/OkHttp HTTPS requests without Cloudflare Turnstile bot-walling (`Cf-Mitigated: None`).
-  - NextAuth session cookie flow (`__Secure-next-auth.session-token`) and unauthenticated fallback response (`fraud_authwall_upsell`) verified and documented.
+- `./gradlew testDebugUnitTest`: BUILD SUCCESSFUL (all unit tests in `PerplexityParserTest` passed).
+- `./gradlew assembleDebug`: BUILD SUCCESSFUL (`app-debug.apk` built cleanly).
+- Real device verification via `mobile-mcp` on Samsung Galaxy J7 Nxt (`SM-J701F`, Android 10 LineageOS 17.1):
+  - Installed `app-debug.apk` via `mobile_install_app`.
+  - Launched app, verified `Perplexity (Web Session)` card rendered under Keys tab with session-risk warning, browser launcher button, and masked token input.
+  - Verified `Perplexity` selectable contender in Chat tab dropdown alongside Demo, Gemini, Groq, and Pollinations.
+  - Verified sending chat prompt without session token produces graceful UI warning (`⚠️ Perplexity: session token missing. Enter __Secure-next-auth.session-token in Keys tab.`) without crashing.
 - `python scripts/collaboration.py validate`: PASSED (zero secrets detected, structure valid).
-- Target hardware (`SM-J701F`, LineageOS 17.1) active and verified via `mobile-mcp`.
 
 ## Next commands
 
 - Read `collaboration/next_commands_for_gemini.md`.
-- Arena architect review of T6a spike findings and architecture green light for T6b Android provider integration (`PerplexitySessionProvider`).
+- Review T6b implementation and plan next provider (T7 Claude session integration or arena multi-contender battle tuning).
 
 ## Reply required
 
-Update `collaboration/messages/arena-to-gemini.md` and `collaboration/STATE.md` with architect review and next orders for T6b.
+Update `collaboration/messages/arena-to-gemini.md` and `collaboration/STATE.md` with architect review and next sprint task.

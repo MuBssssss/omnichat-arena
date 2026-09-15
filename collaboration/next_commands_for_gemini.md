@@ -3,6 +3,15 @@
 This file is the executable handoff for the next Gemini turn. Do not ask the human to copy
 source, logs, or routine status. Use the repository and MCP servers as the transport.
 
+## Status: T6b Complete — Awaiting Arena Review
+
+T6b Perplexity Android session provider slice has been implemented and verified:
+- `PerplexitySessionProvider.kt` with deterministic `PerplexityParser`
+- `AppModule.kt` Dagger multi-binding
+- `SettingsScreen.kt` session card and ViewModel storage
+- `PerplexityParserTest.kt` unit test suite (BUILD SUCCESSFUL)
+- Device verification on `SM-J701F` via `mobile-mcp` (Keys card & Chat selector verified)
+
 ## 1. Synchronize and read the mailbox
 
 Use GitHub MCP first:
@@ -10,53 +19,20 @@ Use GitHub MCP first:
 1. Read `AGENTS.md`, `collaboration/PROTOCOL.md`, `collaboration/STATE.md`, and
    `collaboration/messages/arena-to-gemini.md` from the published ref
    `arena/01a0a4da-omnichat-arena`.
-2. Use `github/list_commits` to verify the latest commit/ref before editing.
-3. Inspect `HANDOFF_TO_GEMINI.md`, `ai-arena-app-plan.md`, and the files named in the mailbox.
-4. Keep all credentials local to the user's secure store. Do not put a real key, cookie,
-   session ID, or device credential in a command, MCP argument, screenshot, log, or commit.
+2. Inspect `HANDOFF_TO_GEMINI.md`, `ai-arena-app-plan.md`, and the files named in the mailbox.
+3. Keep all credentials local to the user's secure store. Do not put a real key, cookie, session
+   ID, bearer token, account email, or device credential in a command, MCP argument, screenshot,
+   log, or commit.
 
-If a local checkout is needed, fetch the ref without switching the Arena branch:
+## 2. Next Sprint Target: T7 — Claude Web Session Integration
 
-```powershell
-git fetch origin --prune
-git log --oneline --decorate -10 origin/arena/01a0a4da-omnichat-arena
-```
+Once Arena architect approves T6b, proceed with T7 per plan §9:
 
-## 2. Continue the next engineering task
-
-Resume the first unchecked task in `HANDOFF_TO_GEMINI.md` rather than inventing a new scope.
-The current cursor is the Perplexity web-session spike/hardening track after T4.2:
-
-1. Spike first in a small, stdlib-only script; do not add an Android provider before the HTTP
-   behavior and failure shape are documented.
-2. Keep the $0-only rule, native chat UI rule, session-storage rule, and account/ToS warnings.
-3. If the spike is blocked, document the evidence and park it cleanly; do not fabricate a live
-   integration.
-4. If the spike passes, implement only the isolated provider changes needed for that task and
-   keep the project compiling.
-
-Use the available `mobile-mcp` tools for any Android acceptance check: list the device, launch
-OmniChat, inspect the screen, perform the smallest relevant interaction, and take a proof
-screenshot. Redact sensitive content before reporting it.
+1. Run isolated spike probe for Claude web session (`spike_claude_session.py`).
+2. Document session cookie protocol, CSRF requirements, and SSE stream endpoints in `docs/spike-claude-SESSION.md`.
+3. Implement `ClaudeSessionProvider.kt`, DI binding, Settings session card, and parser unit tests.
+4. Verify with `./gradlew assembleDebug` and `mobile-mcp` on `SM-J701F`.
 
 ## 3. Publish the response without a human relay
 
-Update these files in the same published change:
-
-- `collaboration/messages/gemini-to-arena.md` — use the full message contract in
-  `collaboration/PROTOCOL.md`.
-- `collaboration/STATE.md` — set `Last message ID`, status, commit/ref, and next owner.
-- `collaboration/next_commands_for_gemini.md` — replace the completed step with the next exact
-  commands, or leave it unchanged if the next task is already explicit.
-
-Publish implementation and mailbox changes with one `github/push_files` call when possible, then
-use `github/list_commits` to confirm the commit. If the MCP server cannot target the Arena ref,
-publish the response on your working branch and record its exact branch and commit in
-`collaboration/STATE.md`.
-
-The response must end with one of these outcomes:
-
-- `DONE`: include files, proof, and the next command file.
-- `BLOCKED`: include the first reproducible blocker and the one decision/action needed.
-
-Never finish with only "please relay this"; the mailbox is the relay.
+Update `collaboration/messages/gemini-to-arena.md` and `collaboration/STATE.md` with test/device proof and push via `github/push_files`.

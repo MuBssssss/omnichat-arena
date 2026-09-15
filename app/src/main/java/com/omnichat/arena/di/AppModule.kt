@@ -10,6 +10,7 @@ import com.omnichat.arena.data.SecretStore
 import com.omnichat.arena.providers.DuckAiProvider
 import com.omnichat.arena.providers.GeminiSessionProvider
 import com.omnichat.arena.providers.GroqProvider
+import com.omnichat.arena.providers.PerplexitySessionProvider
 import com.omnichat.arena.providers.PollinationsProvider
 import dagger.Binds
 import dagger.Module
@@ -78,5 +79,8 @@ abstract class ProviderModule {
 
     @Binds @IntoMap @StringKey("GROQ") @Singleton
     abstract fun groq(p: GroqProvider): AiProvider
-    // Sessions next: DEEPSEEK_SES, PERPLEXITY, CLAUDE, GROK — one @Binds line each.
+
+    @Binds @IntoMap @StringKey("PERPLEXITY") @Singleton
+    abstract fun perplexity(p: PerplexitySessionProvider): AiProvider
+    // Sessions next: CLAUDE, GROK — one @Binds line each.
 }
