@@ -2,8 +2,9 @@
 
 ## Purpose
 
-This is a zero-relay, repository-backed mailbox for Arena, Gemini/Antigravity, Jules, and AI
-Studio. GitHub is the transport; the stable role/ownership rules are in
+This is a zero-relay, repository-backed mailbox for Arena, Gemini/Antigravity, and Jules. AI
+Studio is archived/retired for this cycle because its claimed branch was not verifiable through
+GitHub. GitHub is the transport; the stable role/ownership rules are in
 `collaboration/AGENT_ROLES.md`, and the launch sequence is in
 `collaboration/ORDER_OF_OPERATIONS.md`.
 
@@ -13,8 +14,8 @@ Studio. GitHub is the transport; the stable role/ownership rules are in
 | `collaboration/messages/gemini-to-arena.md` | Gemini | Integration/build/device report |
 | `collaboration/messages/arena-to-jules.md` | Arena | Jules spike task/review |
 | `collaboration/messages/jules-to-arena.md` | Jules | Jules research/spike report |
-| `collaboration/messages/arena-to-aistudio.md` | Arena | AI Studio UI task/review |
-| `collaboration/messages/aistudio-to-arena.md` | AI Studio | AI Studio UI/audit report |
+| `collaboration/messages/arena-to-aistudio.md` | Arena archive | Retired AI Studio verification request |
+| `collaboration/messages/aistudio-to-arena.md` | AI Studio archive | Unverified AI Studio UI/audit report |
 | `collaboration/STATE.md` | Arena only during parallel work | Canonical coordination cursor |
 | `collaboration/prompts/` | Arena | Copy-paste role briefs |
 
@@ -76,10 +77,10 @@ Use repository-relative paths and concise summaries. A message is not complete i
 
 ## Branch/mailbox rule
 
-The Arena agent is fixed to `arena/01a0a4da-omnichat-arena`. Gemini, Jules, and AI Studio should
-work on separate branches or isolated file sets. If a GitHub MCP tool supports a `branch`/`ref`
-argument, it may target the Arena branch for a mailbox-only update; never use that to overwrite
-another agent's source files. Workers record their own branch/ref/SHA in their outbound mailbox.
+The Arena agent is fixed to `arena/01a0a4da-omnichat-arena`. Gemini and Jules should work on
+separate branches or isolated file sets. If a GitHub MCP tool supports a `branch`/`ref` argument,
+it may target the Arena branch for a mailbox-only update; never use that to overwrite another
+agent's source files. Workers record their own branch/ref/SHA in their outbound mailbox.
 
 ## GitHub MCP checklist
 

@@ -21,8 +21,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -143,6 +145,7 @@ private fun GeminiSessionCard(vm: SettingsViewModel, tick: Int, bump: () -> Unit
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("__Secure-1PSID (starts with g.)") },
                 visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrect = false),
                 singleLine = true,
             )
             OutlinedTextField(
@@ -151,6 +154,7 @@ private fun GeminiSessionCard(vm: SettingsViewModel, tick: Int, bump: () -> Unit
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("__Secure-1PSIDTS") },
                 visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrect = false),
                 singleLine = true,
             )
             Button(
@@ -209,6 +213,7 @@ private fun PerplexitySessionCard(vm: SettingsViewModel, tick: Int, bump: () -> 
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("__Secure-next-auth.session-token") },
                 visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrect = false),
                 singleLine = true,
             )
             Button(
@@ -242,7 +247,9 @@ private fun KeyRow(
                 OutlinedTextField(
                     value = v, onValueChange = { v = it }, modifier = Modifier.weight(1f),
                     placeholder = { Text("paste key") },
-                    visualTransformation = PasswordVisualTransformation(), singleLine = true,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrect = false),
+                    singleLine = true,
                 )
                 Button(onClick = { vm.save(p, v); v = ""; bump() }, enabled = v.isNotBlank()) {
                     Text("Save")

@@ -1,44 +1,44 @@
-# Parallel work order
+# Current work order
 
-For the exact human copy-paste messages, use
-`collaboration/HUMAN_LAUNCH_GUIDE.md`. This file is the short operational version.
+For the human copy-paste sequence, see `collaboration/HUMAN_LAUNCH_GUIDE.md`. The current
+AI-Studio lane is retired because its claimed branch/commit could not be verified through GitHub.
+Arena has taken the small UI slice directly.
 
-## Phase 1 — Gemini first, alone
+## Phase 1 — Gemini baseline
 
-1. Open Gemini/Antigravity.
-2. Paste the Gemini message from `collaboration/HUMAN_LAUNCH_GUIDE.md`.
-3. Gemini reads the current ref, runs Gradle tests/build, runs the collaboration validator, and
-   performs one small non-sensitive `mobile-mcp` smoke check.
-4. Gemini publishes the baseline result in `collaboration/messages/gemini-to-arena.md` and stops.
+1. Gemini reads the current ref and runs the Gradle tests/build, collaboration validator, and one
+   small non-sensitive `mobile-mcp` smoke check.
+2. Gemini publishes the result in `collaboration/messages/gemini-to-arena.md`.
+3. Arena reviews the baseline before integration.
 
-Do not start the worker agents until this baseline result is published. This makes the starting
-commit and build status unambiguous.
+## Phase 2 — Jules spike
 
-## Phase 2 — Jules and AI Studio together
+Jules' first-pass Grok feasibility spike is complete and approved only as `PROBED`:
 
-Start both sessions at the same time after Phase 1:
+- `spike_grok_session.py`
+- `docs/spike-grok-SESSION.md`
 
-- Jules: open `https://jules.google.com/session`, paste the Jules box from the human guide, and
-  work only on the T8a Grok feasibility spike plus docs.
-- AI Studio: open `https://aistudio.google.com/apps`, paste the AI Studio box from the human guide,
-  and work only on the Compose UI/accessibility audit and optional small UI slice.
+No Grok Android provider is approved. Future provider work must still be spike-first.
 
-They use separate branches/file ownership and publish independent mailboxes. Neither waits for the
-other. The human does not relay their results.
+## Phase 3 — Arena UI review/patch
 
-## Phase 3 — Arena review
+Arena directly implemented the small UI/accessibility slice described in `docs/ui-audit.md`:
 
-Arena reads `jules-to-arena.md` and `aistudio-to-arena.md`, checks scope, secrets, $0 compliance,
-tests, and conflicts, then updates the canonical `collaboration/STATE.md` cursor.
+- Chat auto-scroll during new/streaming content.
+- IME Send behavior for the prompt field.
+- TalkBack polite live region for generation state.
+- Differentiated user/model/error message cards.
+- Password keyboard and autocorrect suppression for all credential fields.
 
-## Phase 4 — Gemini integration
+## Phase 4 — Gemini integration verification
 
-Only after Arena approval, Gemini integrates approved worker commits, resolves conflicts, runs the
-full Gradle checks, installs/tests the APK with `mobile-mcp`, and publishes the integration report.
+Gemini must pull the latest Arena branch, run `testDebugUnitTest`, `assembleDebug`, the collaboration
+validator, and a non-sensitive `mobile-mcp` check. Only Gemini owns the final Android build/device
+acceptance.
 
 ## Ownership guardrails
 
 - Gemini owns Android integration, Gradle, DI/provider wiring, builds, and device testing.
-- Jules owns spike scripts and spike docs only during the first pass.
-- AI Studio owns Compose UI, accessibility, and UI audit files only during the first pass.
-- Arena owns architecture review, coordination, and `collaboration/STATE.md`.
+- Jules owns spike scripts and spike docs only during a spike.
+- Arena owns architecture review, coordination, UI patches, and `collaboration/STATE.md`.
+- AI Studio is retired for this cycle; do not wait for or integrate its unverified commit.

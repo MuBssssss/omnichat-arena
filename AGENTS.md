@@ -1,7 +1,8 @@
 # OmniChat Arena agent contract
 
 This repository is a shared collaboration network for the Arena architect, Gemini/Antigravity,
-Jules, and AI Studio. Do not make the human copy source files, logs, or routine status between
+and Jules. AI Studio is archived/retired for this cycle because its claimed branch was not
+verifiable through GitHub. Do not make the human copy source files, logs, or routine status between
 agents. Read `collaboration/AGENT_ROLES.md` for ownership before editing.
 
 ## Read first

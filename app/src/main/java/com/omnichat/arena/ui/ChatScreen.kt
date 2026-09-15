@@ -8,19 +8,30 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
@@ -219,8 +230,22 @@ fun ChatScreen(mod: Modifier = Modifier, vm: ChatViewModel = hiltViewModel()) {
     val busy by vm.busy.collectAsState()
     var input by remember { mutableStateOf("") }
     var menu by remember { mutableStateOf(false) }
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(lines.size, lines.lastOrNull()?.text?.length) {
+        if (lines.isNotEmpty()) listState.scrollToItem(lines.lastIndex)
+    }
+
+    fun sendPrompt() {
+        val prompt = input.trim()
+        if (prompt.isNotEmpty() && !busy) {
+            vm.send(prompt)
+            input = ""
+        }
+    }
+
     Column(mod.fillMaxSize().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             Button(onClick = { menu = true }) {
                 Text(ProviderId.valueOf(vm.selected).displayName)
             }
@@ -232,19 +257,54 @@ fun ChatScreen(mod: Modifier = Modifier, vm: ChatViewModel = hiltViewModel()) {
                     )
                 }
             }
-            if (busy) Text("…streaming")
+            Text(
+                text = if (busy) "…streaming" else "Ready",
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+                style = MaterialTheme.typography.labelMedium,
+            )
         }
-        LazyColumn(Modifier.weight(1f).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(lines) { l ->
-                Card { Text("${l.who}:\n${l.text}", Modifier.padding(10.dp)) }
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.weight(1f).fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            items(lines) { line ->
+                val isUser = line.who == "You"
+                val isError = line.text.startsWith("⚠️")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start,
+                ) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(0.92f),
+                        colors = CardDefaults.cardColors(
+                            containerColor = when {
+                                isError -> MaterialTheme.colorScheme.errorContainer
+                                isUser -> MaterialTheme.colorScheme.primaryContainer
+                                else -> MaterialTheme.colorScheme.surfaceVariant
+                            }
+                        ),
+                    ) {
+                        Text("${line.who}:\n${line.text}", Modifier.padding(10.dp))
+                    }
+                }
             }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             OutlinedTextField(
-                value = input, onValueChange = { input = it },
-                modifier = Modifier.weight(1f), placeholder = { Text("Ask…") }
+                value = input,
+                onValueChange = { input = it },
+                modifier = Modifier.weight(1f),
+                placeholder = { Text("Ask…") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+                keyboardActions = KeyboardActions(onSend = { sendPrompt() }),
             )
-            Button(onClick = { vm.send(input); input = "" }, enabled = !busy) { Text("Send") }
+            Button(onClick = { sendPrompt() }, enabled = !busy && input.isNotBlank()) { Text("Send") }
         }
     }
 }

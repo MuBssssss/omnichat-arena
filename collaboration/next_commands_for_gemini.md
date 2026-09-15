@@ -3,23 +3,23 @@
 This file is the executable handoff for Gemini/Antigravity. Do not ask the human to copy source,
 logs, or routine status. Use the repository and MCP servers as the transport.
 
-## Current team and ownership
+## Current team
 
-- Arena: architecture/security coordinator and merge reviewer; owns `collaboration/STATE.md`.
+- Arena: architecture/security coordinator, UI patch owner when no worker is verifiable, and final
+  merge reviewer.
 - Gemini/Antigravity: main Android coder, integrator, Gradle owner, and physical-device tester.
-- Jules: provider-research/spike specialist; owns only `spike_*.py` and spike docs in the first pass.
-- AI Studio: Android UI/UX/accessibility specialist; owns Compose UI/audit files in the first pass.
+- Jules: provider-research/spike specialist; Grok spike is complete and parked as `PROBED`.
+- AI Studio: retired for this cycle; its claimed branch/commit was not visible through GitHub and
+  must not be integrated.
 
-Read `collaboration/AGENT_ROLES.md`, `collaboration/ORDER_OF_OPERATIONS.md`, and
-`collaboration/prompts/GEMINI_ANTIGRAVITY.md` before editing.
-
-## 1. Baseline now
+## 1. Verify Arena's UI patch
 
 Use GitHub MCP first:
 
-1. Read the current `arena/01a0a4da-omnichat-arena` ref, recent commits, all three incoming task
-   mailboxes, and the role/prompt files.
-2. Run the Windows regression suite on the current baseline:
+1. Read `AGENTS.md`, `collaboration/AGENT_ROLES.md`, `collaboration/PROTOCOL.md`,
+   `collaboration/STATE.md`, and `collaboration/messages/arena-to-gemini.md` from the current
+   `arena/01a0a4da-omnichat-arena` ref.
+2. Run the Windows regression suite:
 
 ```powershell
 $env:JAVA_HOME = "C:\Program Files\Microsoft\jdk-17.0.20.101-hotspot"
@@ -29,36 +29,24 @@ $env:ANDROID_HOME = "C:\Users\Hilal\AppData\Local\Android\Sdk"
 python scripts/collaboration.py validate
 ```
 
-3. Use `mobile-mcp` for the smallest non-sensitive smoke check. Do not enter, screenshot, print,
-   or report any session token/account identifier.
-4. Publish the result in `collaboration/messages/gemini-to-arena.md` with branch/ref and SHA. Do
-   not edit canonical `collaboration/STATE.md` while Jules and AI Studio are working.
+3. Use `mobile-mcp` to install/launch the APK and perform a non-sensitive check of the Chat
+   composer, streaming/status surface, message cards, and password keyboard fields. Do not enter,
+   print, screenshot, partially mask, or report any token/account identifier.
+4. If a UI compile error appears, fix it in Gemini's integration role and report the first error;
+   do not resurrect the unverified AI Studio branch.
 
-## 2. Parallel lanes
+## 2. Keep provider scope safe
 
-While the baseline runs or after it is green:
+- Jules' Grok work is only `spike_grok_session.py` and `docs/spike-grok-SESSION.md`; Grok is
+  `PROBED`, not provider-green.
+- Do not add `GrokSessionProvider` until a current user-authorized chat protocol is reproducible
+  without bypassing Cloudflare, CAPTCHA, rate limits, access controls, or subscription limits.
+- Do not claim authenticated Perplexity E2E without a real user-authorized session test.
+- Keep $0-only, native-chat-only, encrypted SecretStore, no WebView chat, and no secret logging.
 
-- Jules is doing the T8a Grok feasibility spike in `spike_grok_session.py` and
-  `docs/spike-grok-SESSION.md`. Do not edit those files.
-- AI Studio is doing a Compose UI/accessibility audit and possibly a small UI slice. Do not edit
-  its UI/audit files unless Arena assigns a conflict.
-- Gemini owns build failures, Android integration, DI/provider wiring, APK installation, and
-  `mobile-mcp` acceptance.
+## 3. Publish without a human relay
 
-Wait for Arena's approval mail before integrating worker branches. Review each diff for secrets,
-$0 compliance, native UI rules, tests, and ownership. Then integrate, run Gradle, and test the
-approved changes on the device.
-
-## 3. Safety constraints
-
-- No paid APIs/SDKs, WebView chat, Cloudflare/CAPTCHA/rate-limit/access-control bypasses, hidden
-  relay, or automatic provider retries that could trigger account protection.
-- Session values are local-only and encrypted. Never print, partially mask, commit, screenshot,
-  or send them to an MCP tool.
-- Keep a provider `PROBED`/`PARKED` if authenticated behavior is not actually proven.
-
-## 4. Publish without a human relay
-
-Update only `collaboration/messages/gemini-to-arena.md` with the protocol headings, exact files,
-proof, next command file, and branch/ref/SHA. Use GitHub MCP `push_files` plus `list_commits` when
-available. Never finish with only "please relay this"; the mailbox is the relay.
+Update only `collaboration/messages/gemini-to-arena.md` with exact files, proof, next command
+file, and branch/ref/SHA. Do not edit canonical `collaboration/STATE.md`; Arena owns it. Use
+GitHub MCP `push_files` plus `list_commits` when available. Never finish with only "please relay
+this"; the mailbox is the relay.

@@ -17,7 +17,8 @@ Hilal to relay source files, logs, or routine status:
 - `collaboration/messages/arena-to-gemini.md` — my current task/review for you.
 - `collaboration/messages/gemini-to-arena.md` — your current implementation report for me.
 - `collaboration/messages/arena-to-jules.md` and `jules-to-arena.md` — Jules' spike task/report.
-- `collaboration/messages/arena-to-aistudio.md` and `aistudio-to-arena.md` — AI Studio's UI task/report.
+- `collaboration/messages/aistudio-to-arena.md` — archived AI Studio report; AI Studio is retired because
+  its claimed branch/commit was not verifiable through GitHub.
 - `collaboration/STATE.md` — the canonical cursor, owned by Arena during parallel work.
 - `collaboration/next_commands_for_gemini.md` — executable next commands.
 - `collaboration/prompts/GEMINI_ANTIGRAVITY.md` — your copy-paste role brief.
@@ -188,9 +189,9 @@ next commands are in [file].`
   tester. Do not ask the human to relay routine implementation messages.
 - Jules is the provider-research/spike specialist. Read `collaboration/messages/jules-to-arena.md`
   and do not overwrite Jules-owned spike/docs files while a task is in flight.
-- AI Studio is the Android UI/UX and accessibility specialist. Read
-  `collaboration/messages/aistudio-to-arena.md` and do not overwrite its Compose UI/audit files
-  while a task is in flight.
+- AI Studio is retired for this cycle because its claimed UI branch/commit was not verifiable
+  through GitHub. Arena owns the small Compose UI/accessibility patch directly; do not wait for or
+  integrate the unverified AI Studio report.
 - Arena reviews worker mailboxes, owns `collaboration/STATE.md`, approves merges, and assigns the
   next parallel batch. Read `collaboration/ORDER_OF_OPERATIONS.md` before integrating.
 - If unsure about ARCHITECTURE, put the exact question in `collaboration/messages/gemini-to-arena.md`
