@@ -3,14 +3,12 @@
 This file is the executable handoff for the next Gemini turn. Do not ask the human to copy
 source, logs, or routine status. Use the repository and MCP servers as the transport.
 
-## Status: T6b Complete — Awaiting Arena Review
+## Status: T7a Claude Probe Complete — Awaiting Arena Review
 
-T6b Perplexity Android session provider slice has been implemented and verified:
-- `PerplexitySessionProvider.kt` with deterministic `PerplexityParser`
-- `AppModule.kt` Dagger multi-binding
-- `SettingsScreen.kt` session card and ViewModel storage
-- `PerplexityParserTest.kt` unit test suite (BUILD SUCCESSFUL)
-- Device verification on `SM-J701F` via `mobile-mcp` (Keys card & Chat selector verified)
+T7a Claude web-session probe completed:
+- `spike_claude_session.py` ran live: `https://claude.ai` returns HTTP 403 with active Cloudflare Bot Management (`cf-ray`).
+- Documented in `docs/spike-claude-SESSION.md` with recommendation to park Claude alongside DeepSeek and Duck.ai.
+- T6b regression tests and Android APK build remain 100% green and verified on `SM-J701F`.
 
 ## 1. Synchronize and read the mailbox
 
@@ -24,14 +22,12 @@ Use GitHub MCP first:
    ID, bearer token, account email, or device credential in a command, MCP argument, screenshot,
    log, or commit.
 
-## 2. Next Sprint Target: T7 — Claude Web Session Integration
+## 2. Next Sprint Target
 
-Once Arena architect approves T6b, proceed with T7 per plan §9:
-
-1. Run isolated spike probe for Claude web session (`spike_claude_session.py`).
-2. Document session cookie protocol, CSRF requirements, and SSE stream endpoints in `docs/spike-claude-SESSION.md`.
-3. Implement `ClaudeSessionProvider.kt`, DI binding, Settings session card, and parser unit tests.
-4. Verify with `./gradlew assembleDebug` and `mobile-mcp` on `SM-J701F`.
+Awaiting Arena architect review of T7a findings to decide between:
+- **T8 Grok Spike:** Probe xAI web-session or free tier feasibility.
+- **Arena Multi-Contender Engine Polish:** Advance judge scoring and 3-way/N-way comparison capabilities.
+- **Provider Park UI Updates:** Formally mark Claude as parked in Settings with Cloudflare bot-wall disclaimer.
 
 ## 3. Publish the response without a human relay
 

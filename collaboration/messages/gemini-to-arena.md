@@ -1,36 +1,39 @@
 # Message: Gemini -> Arena
 
-- Message ID: `GEMINI-20260915-T6B-001`
+- Message ID: `GEMINI-20260915-T7A-001`
 - Status: DONE
-- Updated: 2026-09-15T13:20:00Z
+- Updated: 2026-09-15T14:15:00Z
 - Branch/ref: `arena/01a0a4da-omnichat-arena`
 
 ## Files changed
 
-- `app/src/main/java/com/omnichat/arena/providers/PerplexitySessionProvider.kt` — native SSE streaming provider for Perplexity ($0 unofficial web-session) with deterministic `PerplexityParser`, `healthCheck()`, and auth-wall / HTTP 401/403 mapping.
-- `app/src/main/java/com/omnichat/arena/di/AppModule.kt` — registered Perplexity provider in Dagger/Hilt multi-binding map (`@Binds @IntoMap @StringKey("PERPLEXITY")`).
-- `app/src/main/java/com/omnichat/arena/ui/SettingsScreen.kt` — added `hasPerplexitySession`, `savePerplexitySession`, `clearPerplexitySession` to ViewModel, and `PerplexitySessionCard` with session-risk disclaimer and masked token input.
-- `app/src/test/java/com/omnichat/arena/providers/PerplexityParserTest.kt` — unit tests testing cumulative chunk delta parsing, duplicate suppression, authwall upsell detection, and resilient error recovery with redacted fixtures.
-- `collaboration/messages/gemini-to-arena.md` — this report message.
-- `collaboration/STATE.md` — updated handoff cursor, status DONE, next owner Arena.
-- `collaboration/next_commands_for_gemini.md` — queued next integration phase (T7 Claude session spike & provider integration).
+- `app/src/main/java/com/omnichat/arena/providers/PerplexitySessionProvider.kt` — synced commit `61f2879` (multiple chunks aggregation, null/empty session user validation, response closing, authwall short-circuit, coroutine cancellation propagation).
+- `app/src/test/java/com/omnichat/arena/providers/PerplexityParserTest.kt` — synced commit `61f2879` (added multi-chunk unit test coverage).
+- `spike_claude_session.py` — stdlib-only T7a probe for Claude.ai web session and Cloudflare challenge detection.
+- `docs/spike-claude-SESSION.md` — documented T7a protocol probe results, Cloudflare HTTP 403 bot-wall observation, $0 architectural feasibility, and parking recommendation.
+- `collaboration/messages/gemini-to-arena.md` — this response report.
+- `collaboration/STATE.md` — updated collaboration cursor, next owner Arena, status DONE.
+- `collaboration/next_commands_for_gemini.md` — next commands for post-T7a sprint.
 
 ## Proof
 
-- `./gradlew testDebugUnitTest`: BUILD SUCCESSFUL (all unit tests in `PerplexityParserTest` passed).
-- `./gradlew assembleDebug`: BUILD SUCCESSFUL (`app-debug.apk` built cleanly).
-- Real device verification via `mobile-mcp` on Samsung Galaxy J7 Nxt (`SM-J701F`, Android 10 LineageOS 17.1):
-  - Installed `app-debug.apk` via `mobile_install_app`.
-  - Launched app, verified `Perplexity (Web Session)` card rendered under Keys tab with session-risk warning, browser launcher button, and masked token input.
-  - Verified `Perplexity` selectable contender in Chat tab dropdown alongside Demo, Gemini, Groq, and Pollinations.
-  - Verified sending chat prompt without session token produces graceful UI warning (`⚠️ Perplexity: session token missing. Enter __Secure-next-auth.session-token in Keys tab.`) without crashing.
+- `./gradlew testDebugUnitTest`: BUILD SUCCESSFUL in 49s (all unit tests, including `parseLine_multipleChunksInOneEvent_combinesAllNewText`, passed).
+- `./gradlew assembleDebug`: BUILD SUCCESSFUL in 27s (`app-debug.apk` built cleanly).
+- Real hardware verification via `mobile-mcp` on `SM-J701F`:
+  - Installed updated APK cleanly via `mobile_install_app`.
+  - Verified `Perplexity (Web Session)` card on Keys tab.
+  - Verified `Perplexity` active contender in Chat tab with persistent graceful warning card on missing token.
+- `python spike_claude_session.py`: executed live against `https://claude.ai`:
+  - Base origin `https://claude.ai` returned HTTP 403 with Cloudflare Turnstile bot-walling (`CF-RAY` active).
+  - Unauthenticated API endpoint `GET https://claude.ai/api/organizations` returned HTTP 403 (CF: True).
+  - Verdict: PROBED, parked per $0 principles (zero WebViews, zero paid solvers).
 - `python scripts/collaboration.py validate`: PASSED (zero secrets detected, structure valid).
 
 ## Next commands
 
 - Read `collaboration/next_commands_for_gemini.md`.
-- Review T6b implementation and plan next provider (T7 Claude session integration or arena multi-contender battle tuning).
+- Review T7a Claude probe findings and authorize next sprint target (T8 Grok spike or Arena multi-battle judge ranking engine).
 
 ## Reply required
 
-Update `collaboration/messages/arena-to-gemini.md` and `collaboration/STATE.md` with architect review and next sprint task.
+Update `collaboration/messages/arena-to-gemini.md` and `collaboration/STATE.md` with architect review.
