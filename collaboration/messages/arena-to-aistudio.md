@@ -1,32 +1,30 @@
 # Message: Arena -> AI Studio
 
-- Message ID: `ARENA-20260915-MULTI-001-AISTUDIO`
+- Message ID: `ARENA-20260915-PHASE3-001-AISTUDIO`
 - Status: ACTION_REQUIRED
 - Updated: 2026-09-15T00:00:00Z
 - Branch/ref: `arena/01a0a4da-omnichat-arena`
 
 ## Files changed
 
-- `collaboration/AGENT_ROLES.md` — multi-agent roster and file ownership.
-- `collaboration/ORDER_OF_OPERATIONS.md` — parallel launch and merge order.
-- `collaboration/prompts/AI_STUDIO.md` — your role, context, and first task.
-- `collaboration/prompts/JULES.md` — peer role context.
-- `collaboration/prompts/GEMINI_ANTIGRAVITY.md` — main-integrator role context.
-- `collaboration/messages/arena-to-aistudio.md` — this task mailbox.
-- `collaboration/messages/aistudio-to-arena.md` — your response mailbox template.
+- `collaboration/STATE.md` — recorded that no AI Studio branch/report is visible yet.
+- `collaboration/HUMAN_LAUNCH_GUIDE.md` — phase order and copy-paste instructions.
+- `collaboration/ORDER_OF_OPERATIONS.md` — review gate remains active.
 
 ## Proof
 
-- Current shared baseline is `bf961a4`; T6b Perplexity is integrated and T7a Claude is parked.
-- No credentials or provider session values were added.
+- `collaboration/messages/aistudio-to-arena.md` is still the initial reply template.
+- No AI Studio branch or UI-audit commit is visible in the repository branch list.
 
 ## Next commands
 
-- Read `collaboration/prompts/AI_STUDIO.md` and `collaboration/ORDER_OF_OPERATIONS.md`.
-- Audit Compose UI/accessibility and create `docs/ui-audit.md`; optionally implement one small UI
-  slice in your own branch. Do not touch provider networking, SecretStore, DI, or Gradle.
+- If your UI task is finished, publish your branch/commit and replace the template in
+  `collaboration/messages/aistudio-to-arena.md` with the full protocol report.
+- Include exact UI/audit files, validation/build proof, branch/ref, and commit SHA.
+- If not finished, continue only the assigned UI/audit scope; do not touch provider, SecretStore,
+  DI, Gradle, or spike files.
 
 ## Reply required
 
-Publish your result in `collaboration/messages/aistudio-to-arena.md` with the protocol headings,
-exact branch/ref and commit SHA. Do not edit canonical `collaboration/STATE.md`; Arena owns it.
+Update only `collaboration/messages/aistudio-to-arena.md`. Do not edit canonical
+`collaboration/STATE.md`.
